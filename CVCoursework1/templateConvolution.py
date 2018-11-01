@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import numpy as np
+import cv2
 
 #   Template convolution
-#
-
 def template_convolve(image, template):
 
     # get image dimensions and template dimensions
-    image_rows, image_cols = image.shape
+    image_rows = image.shape[0]
+    image_cols = image.shape[1]
 
     template_rows, template_cols = template.shape
 
@@ -39,18 +39,51 @@ def template_convolve(image, template):
 
     return result
 
+# Split the image into three channels, convolve each of them, and return the merge of all
+def convolve(image, template):
+
+    # If the image is a color image
+    if len(image.shape) == 3:
+        # Split the image into three images
+        b, g, r = cv2.split(image)
+
+        # Convolve each of them
+        convolved_b = template_convolve(b, template)
+        convolved_g = template_convolve(g, template)
+        convolved_r = template_convolve(r, template)
+
+        # Merge
+        newImg = cv2.merge((convolved_b, convolved_g, convolved_r))
+
+        return newImg
+    else:
+        return template_convolve(image, template)
+
 if __name__ == '__main__':
     # image = np.array([[0] * 3] * 5)
     # template = np.array([[0] * 4] * 3)
     # template_convolve(image, template)
     image = np.array([[10, 20, 30, 40, 50],
-                      [20, 30, 40, 50, 60],
-                      [30, 40, 10, 20, 30],
-                      [40, 50, 60, 70, 80],
-                      [50, 60, 70, 80, 90]])
-    print("image: ", image)
+                     [20, 30, 40, 50, 60],
+                    [30, 40, 10, 20, 30],
+                     [40, 50, 60, 70, 80],
+                     [50, 60, 70, 80, 90]])
+
+    # image = cv2.imread('./data/bicycle.bmp') / 255.0
+    # print("image: ", image)
+    # print("shape: ", image.shape)
+
+    # b, g, r = cv2.split(image)
+    # print("image r: ", r)
+    # # cv2.imshow("Red 1", r)
+    # # cv2.imshow("Blue 1", b)
+    # # cv2.imshow("Green 1", g)
+    # cv2.waitKey(0)
+
+
     template = np.array([[1, 2, 1],
                          [0, 0, 0],
                          [-1, -2, -1]])
     print("template: ", template)
-    print(template_convolve(image, template))
+
+    print(convolve(image, template))
