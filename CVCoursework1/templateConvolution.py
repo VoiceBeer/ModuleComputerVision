@@ -18,25 +18,28 @@ def template_convolve(image, template):
     # set an output as black. (initialize an same size array with original image,
     # since this assignment said "The border pixels should be set to 0." so give value 0 to this array
     # as Mark said in his book)
-    result = np.array([[0] * image_rows] * image_cols)
+    result = np.array([[0.0] * image_cols] * image_rows)
 
     # convolve the template
     # The indexes of start point and end point are different than the codes in Mark's book
     # Because 0 is the first index, I don't know whether 0 is the first index in Matlab.
-    for x in range(htc + 1, image_cols - htc + 1): # for loop from the (left border - htc + 1) to the (right border - htc)
-        for y in range(htr + 1, image_rows - htr + 1): # for loop from the (upper border - htr + 1) to the (lower border - htr)
-            sum = 0 # initialize the sum
-            for iwin in range(1, template_cols + 1): # Traverse from 1 to cols
-                for jwin in range(1, template_rows + 1): # Traverse from 1 to rows
+    for x in range(htc, image_cols-htc): # for loop from the (left border - htc + 1) to the (right border - htc)
+        for y in range(htr, image_rows-htr): # for loop from the (upper border - htr + 1) to the (lower border - htr)
+            sum = 0.0 # initialize the sum
+            for iwin in range(0, template_cols): # Traverse from 1 to cols
+                for jwin in range(0, template_rows): # Traverse from 1 to rows
                     # Pixel values are multiplied by the corresponding weighting coefficient and added to an overall sum
                     # The sum (usually) evaluates a new value for the centre pixel (where the template is centred) and this becomes the pixel in the output image
                     # Remember to reverse the template, which means, it's not like O11 * W11, O12 * W12, actually
                     # It's O11 * W33, O12 * W32
-                    #print(y+jwin-htr-2, x+iwin-htc-2, template_rows-jwin, template_cols-iwin)
-                    sum = sum + image[y+jwin-htr-2, x+iwin-htc-2] * template[template_rows-jwin, template_cols-iwin]
-            #print("------")
-            result[y - 1, x - 1] = sum # Give the new value to the new image
+                    # print(y+jwin-htr, x+iwin-htc, template_rows-jwin-1, template_cols-iwin-1)
+                    # print("sum: ", image[y+jwin-htr, x+iwin-htc] * template[template_rows-jwin-1, template_cols-iwin-1])
+                    sum = float(sum + image[y+jwin-htr, x+iwin-htc] * template[template_rows-jwin-1, template_cols-iwin-1])
+                    # print(sum)
+            # print("------")
+            result[y, x] = sum # Give the new value to the new image
 
+    print("result: ", result)
     return result
 
 # Split the image into three channels, convolve each of them, and return the merge of all
@@ -63,13 +66,13 @@ if __name__ == '__main__':
     # image = np.array([[0] * 3] * 5)
     # template = np.array([[0] * 4] * 3)
     # template_convolve(image, template)
-    image = np.array([[10, 20, 30, 40, 50],
-                     [20, 30, 40, 50, 60],
-                    [30, 40, 10, 20, 30],
-                     [40, 50, 60, 70, 80],
-                     [50, 60, 70, 80, 90]])
+    # image = np.array([[10, 20, 30, 40, 50],
+    #                  [20, 30, 40, 50, 60],
+    #                 [30, 40, 10, 20, 30],
+    #                  [40, 50, 60, 70, 80],
+    #                  [50, 60, 70, 80, 90]])
 
-    # image = cv2.imread('./data/bicycle.bmp') / 255.0
+    image = cv2.imread('./data/cat.bmp') / 1.0
     # print("image: ", image)
     # print("shape: ", image.shape)
 
@@ -86,4 +89,5 @@ if __name__ == '__main__':
                          [-1, -2, -1]])
     print("template: ", template)
 
-    print(convolve(image, template))
+    cv2.imshow("Result", convolve(image, template))
+    cv2.waitKey(0)
