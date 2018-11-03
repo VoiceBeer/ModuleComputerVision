@@ -18,7 +18,7 @@ def template_convolve(image, template):
     # set an output as black. (initialize an same size array with original image,
     # since this assignment said "The border pixels should be set to 0." so give value 0 to this array
     # as Mark said in his book)
-    result = np.array([[0.0] * image_cols] * image_rows)
+    result = np.zeros((image_rows, image_cols), np.uint8)
 
     # convolve the template
     # The indexes of start point and end point are different than the codes in Mark's book
@@ -34,8 +34,8 @@ def template_convolve(image, template):
                     # It's O11 * W33, O12 * W32
                     # print(y+jwin-htr, x+iwin-htc, template_rows-jwin-1, template_cols-iwin-1)
                     # print("sum: ", image[y+jwin-htr, x+iwin-htc] * template[template_rows-jwin-1, template_cols-iwin-1])
-                    sum = float(sum + image[y+jwin-htr, x+iwin-htc] * template[template_rows-jwin-1, template_cols-iwin-1])
-                    # print(sum)
+                    sum += image[y+jwin-htr, x+iwin-htc] * template[template_rows-jwin-1, template_cols-iwin-1]
+                     #print(sum)
             # print("------")
             result[y, x] = sum # Give the new value to the new image
 
@@ -62,6 +62,25 @@ def convolve(image, template):
     else:
         return template_convolve(image, template)
 
+def gaussian(winsize, sigma):
+
+    # winsize: size of template (odd, integer)
+    # sigma: variance of Gaussian function
+    centre = np.floor(winsize/2)
+
+    # initiate sum
+    sum = 0.0
+
+    template = np.zeros((winsize, winsize), np.double)
+
+    for i in range(0, winsize):
+        for j in range(0,winsize):
+            template[j, i] = np.exp(-(((j-centre) * (j-centre)) +
+                                      ((i-centre) * (i-centre))) / (2*sigma*sigma))
+            sum += template[j, i]
+    template = template / sum
+    return template
+
 if __name__ == '__main__':
     # image = np.array([[0] * 3] * 5)
     # template = np.array([[0] * 4] * 3)
@@ -84,10 +103,16 @@ if __name__ == '__main__':
     # cv2.waitKey(0)
 
 
-    template = np.array([[1, 2, 1],
-                         [0, 0, 0],
-                         [-1, -2, -1]])
-    print("template: ", template)
+    # template = np.array([[1, 2, 1],
+    #                     [0, 0, 0],
+    #                     [-1, -2, -1]])
+    # print("template: ", template)
 
+    # cv2.imshow("Result", convolve(image, template))
+    # cv2.waitKey(0)
+    # print(gaussian(5, 1.0))
+
+    template = gaussian(5, 1.0)
+    print(template)
     cv2.imshow("Result", convolve(image, template))
     cv2.waitKey(0)

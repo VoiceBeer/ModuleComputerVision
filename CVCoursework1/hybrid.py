@@ -73,6 +73,8 @@ if __name__ == '__main__':
     kernel = cv2.getGaussianKernel(cutoff_frequency * 4 + 1, cutoff_frequency)
     kernel = cv2.mulTransposed(kernel, False)
 
+    print("Gaussian kernal: ", kernel)
+
     """
     YOUR CODE BELOW. Use my_imfilter to create 'low_frequencies' and
     'high_frequencies' and then combine them to create 'hybrid_image'
