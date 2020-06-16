@@ -1,1 +1,1 @@
-# COMP6223ComputerVision
+# ComputerVision
